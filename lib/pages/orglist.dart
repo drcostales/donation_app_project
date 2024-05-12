@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OrgList extends StatefulWidget {
-  const OrgList({Key? key}) : super(key: key);
+  const OrgList({super.key});
 
   @override
   State<OrgList> createState() => _OrgListState();
@@ -50,7 +50,7 @@ class _OrgListState extends State<OrgList> {
               ),
               trailing: TextButton(
                 onPressed: () {
-                  // Navigate to details page or perform action on button press
+                  //navigate to details page
                 },
                 child: const Text("View Details"),
               ),
