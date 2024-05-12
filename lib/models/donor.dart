@@ -1,4 +1,4 @@
-class User {
+class Donor {
   String userId;
   String name;
   String username;
@@ -7,7 +7,7 @@ class User {
   // bool isAdmin;
   // bool hasOrg;
 
-  User(
+  Donor(
       {required this.userId,
       required this.name,
       required this.username,
