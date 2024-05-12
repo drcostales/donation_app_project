@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OrgList extends StatefulWidget {
-  const OrgList({super.key});
+  const OrgList({Key? key}) : super(key: key);
 
   @override
   State<OrgList> createState() => _OrgListState();
@@ -9,10 +9,15 @@ class OrgList extends StatefulWidget {
 
 class _OrgListState extends State<OrgList> {
   final List<Map<String, String>> organizations = [
-    {"name": "Care for Gaza", "description": "Aid for Gaza residents"},
+    {
+      "name": "Care for Gaza",
+      "description": "Aid for Gaza residents",
+      "image": "sampleimages/careforgaza.jpeg"
+    },
     {
       "name": "Project Zero K",
-      "description": "Environmental conservation initiative"
+      "description": "Aims to save impounded dogs",
+      "image": "sampleimages/sws.jpeg"
     },
     {
       "name": "Strays Worth Saving (SWS)",
@@ -20,7 +25,8 @@ class _OrgListState extends State<OrgList> {
     },
     {
       "name": "Bach Project",
-      "description": "Promoting classical music education"
+      "description": "Animal rescue and welfare organization",
+      "image": "sampleimages/sws.jpeg"
     }
   ];
 
@@ -28,32 +34,45 @@ class _OrgListState extends State<OrgList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Organizations",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Organizations"),
       ),
       body: ListView.builder(
         itemCount: organizations.length,
         itemBuilder: (BuildContext context, int index) {
           return Card(
             margin: const EdgeInsets.all(10),
-            child: ListTile(
-              title: Text(
-                organizations[index]["name"]!,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              subtitle: Text(
-                organizations[index]["description"]!,
-                style: const TextStyle(fontSize: 12),
-              ),
-              trailing: TextButton(
-                onPressed: () {
-                  //navigate to details page
-                },
-                child: const Text("View Details"),
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (organizations[index]["image"] != null)
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(10.0)),
+                    child: Image.asset(
+                      organizations[index]["image"]!,
+                      width: double.infinity,
+                      height: 150,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ListTile(
+                  title: Text(
+                    organizations[index]["name"]!,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  subtitle: Text(
+                    organizations[index]["description"]!,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  trailing: TextButton(
+                    onPressed: () {
+                      // navigate to donation form page
+                    },
+                    child: const Text("Donate"),
+                  ),
+                ),
+              ],
             ),
           );
         },
