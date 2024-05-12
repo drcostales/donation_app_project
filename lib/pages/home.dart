@@ -12,7 +12,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: const Text("Donation"),
       ),
       body: Center(
@@ -24,6 +24,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.pushNamed(context, '/signin');
               },
               child: const Text("SIGN IN PAGE"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/orglist');
+              },
+              child: const Text("ORGANIZATIONS"),
             ),
           ],
         ),
