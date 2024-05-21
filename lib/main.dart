@@ -1,8 +1,11 @@
-import 'package:flutter/material.dart';
+
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'firebase_options.dart';
+import 'pages/pages.dart';
+import 'providers/auth_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,8 +16,8 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: ((context) => ())),
-        ChangeNotifierProvider(create: ((context) => ()))
+        // ChangeNotifierProvider(create: ((context) => TodoListProvider())),
+        ChangeNotifierProvider(create: ((context) => UserAuthProvider()))
       ],
       child: MyApp(),
     ),
@@ -28,14 +31,47 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'UPLB Donation App',
+      title: 'SimpleTodo',
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomePage(),
+        '/': (context) => const SignInPage(),
+        '/org_home': (context) => OrgHomePage(),
+        '/donor_home': (context) => DonorHomePage(),
       },
       theme: ThemeData(
-        primarySwatch: Color.fromARGB(255, 21, 187, 126),
+        primarySwatch: Colors.blue,
       ),
     );
   }
 }
+
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+//   );
+
+//   runApp(MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({Key? key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'UPLB Donation App',
+//       initialRoute: '/',
+//       routes: {
+//         '/': (context) =>  HomePage(),
+//         '/pages/donation_form': (context) => DonationForm(organization_id: '0001',),
+//       },
+//       theme: ThemeData(
+//         primarySwatch: Colors.green, // Changed to use a default green color
+//       ),
+//     );
+//   }
+// }
+
+
