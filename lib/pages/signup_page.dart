@@ -1,11 +1,10 @@
-//firstname field
-//lastname field
-//password requirements regex
-
-
-
-
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:flutter_pw_validator/flutter_pw_validator.dart';
+import 'package:phonenumbers/phonenumbers.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -16,11 +15,24 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  String? firstname;
-  String? lastname;
+  final GlobalKey<FlutterPwValidatorState> validatorKey =
+      GlobalKey<FlutterPwValidatorState>();
+  String? fname;
+  String? lname;
+  String? address;
+  String? contact;
   String? email;
   String? password;
-  final RegExp nameRegExp = RegExp(r'^[a-zA-Z\s]{1,30}$');
+  bool isPasswordValid = false;
+
+  final _pwcontroller = TextEditingController();
+  final _contactController = PhoneNumberEditingController();
+
+  @override
+  void dispose() {
+    _pwcontroller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,50 +45,96 @@ class _SignUpState extends State<SignUpPage> {
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [heading, firstNameField, lastNameField, emailField, passwordField, submitButton],
+                children: [
+                  heading,
+                  fnameField,
+                  lnameField,
+                  contactField,
+                  addressField,
+                  emailField,
+                  passwordField,
+                  submitButton
+                ],
               ),
             )),
       ),
     );
   }
 
-  Widget get firstNameField => Padding(
-        padding: const EdgeInsets.only(bottom: 30),
-        child: TextFormField(
-          decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              label: Text("First Name"),
-              ),
-          onSaved: (value) => setState(() => firstname = value),
-          validator: (value) {
-            if (!nameRegExp.hasMatch(value ?? "")) {
-              return "Enter your first name.";
-            }return null;
-          },
-        ),
-      );
-
-  Widget get lastNameField => Padding(
-        padding: const EdgeInsets.only(bottom: 30),
-        child: TextFormField(
-          decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              label: Text("Last Name"),
-              ),
-          onSaved: (value) => setState(() => lastname = value),
-          validator: (value) {
-            if (!nameRegExp.hasMatch(value ?? "")) {
-              return "Enter your last name.";
-            }return null;
-          },
-        ),
-      );
-
   Widget get heading => const Padding(
         padding: EdgeInsets.only(bottom: 30),
         child: Text(
           "Sign Up",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        ),
+      );
+
+  Widget get fnameField => Padding(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: TextFormField(
+          decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              label: Text("First Name"),
+              hintText: "Enter your first name"),
+          onSaved: (value) => setState(() => fname = value),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Please enter your first name";
+            }
+            return null;
+          },
+        ),
+      );
+
+  Widget get lnameField => Padding(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: TextFormField(
+          decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              label: Text("Last Name"),
+              hintText: "Enter your last name"),
+          onSaved: (value) => setState(() => lname = value),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Please enter your last name";
+            }
+            return null;
+          },
+        ),
+      );
+
+  Widget get contactField => Padding(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: TextFormField(
+          // controller: _contactController,
+          decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              label: Text("Contact Number"),
+              hintText: "Enter your contact number"),
+          onSaved: (value) => setState(() => contact = value),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Please enter your contact";
+            }
+            return null;
+          },
+        ),
+      );
+
+  Widget get addressField => Padding(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: TextFormField(
+          decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              label: Text("Address"),
+              hintText: "Enter your address"),
+          onSaved: (value) => setState(() => address = value),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Please enter your address";
+            }
+            return null;
+          },
         ),
       );
 
@@ -89,56 +147,88 @@ class _SignUpState extends State<SignUpPage> {
               hintText: "Enter a valid email"),
           onSaved: (value) => setState(() => email = value),
           validator: (value) {
-            RegExp emailRegExp = RegExp(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
             if (value == null || value.isEmpty) {
-              return "Please enter a valid email format.";
-            } else if (!emailRegExp.hasMatch(value)) {
-              return "Please enter a valid email format.";
-            }return null;
+              return "Please enter a valid email format";
+            }
+            if (!EmailValidator.validate(value)) {
+              return "Please enter a valid email address (e.g. juandelacruz@gmail.com)";
+            }
+            return null;
           },
         ),
       );
 
-  Widget get passwordField => Padding(
-        padding: const EdgeInsets.only(bottom: 30),
-        child: Column(children: [TextFormField(
-          decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              label: Text("Password"),
-              hintText: "At least 6 characters"),
-          obscureText: true,
-          onSaved: (value) => setState(() => password = value),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return "Please enter a valid password";
-            }
-            //Using regexp to force user to make a secure password
-            //(?=.*[\W_]) uses non-word characters 
-            final RegExp passwordRegex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$');
-            if (!passwordRegex.hasMatch(value)) {
-              return  "Password must have at least 1 small letter, 1 capital  \nletter, 1 digit, 1 special character, and at least 8 \ncharacters";
-            }
-            return null;
-          },
-        ),const SizedBox(height: 8,)],)
+  Widget get passwordField => Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 30),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                  child: TextFormField(
+                    controller: _pwcontroller,
+                    obscureText: true, // Hide password
+                    decoration: const InputDecoration(
+                        label: Text("Password"),
+                        hintText: "Enter your password",
+                        border: OutlineInputBorder()),
+                    onSaved: (value) => setState(() => password = value),
+                    validator: (value) {
+                      if (!isPasswordValid) {
+                        return "Please enter a valid password";
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 4),
+                FlutterPwValidator(
+                  key: validatorKey,
+                  controller: _pwcontroller,
+                  minLength: 6,
+                  uppercaseCharCount: 1,
+                  numericCharCount: 1,
+                  specialCharCount: 1,
+                  width: 400,
+                  height: 140,
+                  onSuccess: () {
+                    setState(() {
+                      isPasswordValid = true; // Update password validity state
+                    });
+                    print("Password is valid");
+                  },
+                  onFail: () {
+                    setState(() {
+                      isPasswordValid = false; // Update password validity state
+                    });
+                    print("Password is not valid");
+                  },
+                )
+              ],
+            ),
+          )
+        ],
       );
 
   Widget get submitButton => ElevatedButton(
       onPressed: () async {
-        // if (_formKey.currentState!.validate()) {
-        //   _formKey.currentState!.save();
-        //   await context
-        //       .read<UserAuthProvider>()
-        //       .authService
-        //       .signUp(bool donor, lastname!, email!, password!);
+        if (_formKey.currentState!.validate()) {
+          _formKey.currentState!.save();
+          String fullname = "${fname!} ${lname!}";
+          Map<String, dynamic> userData = {
+            "full name": fullname,
+            "contact": contact,
+            "address": address
+          };
+          await context
+              .read<UserAuthProvider>()
+              .authService
+              .signUp(true, email!, password!, userData);
 
-        //   // check if the widget hasn't been disposed of after an asynchronous action
-        //   if (mounted) Navigator.pop(context);
-
-        //   // Navigate to home page if sign up is successful
-        //   Navigator.pushReplacementNamed(context, '/home');
-
-        // }
+          // check if the widget hasn't been disposed of after an asynchronous action
+          if (mounted) Navigator.pop(context);
+        }
       },
       child: const Text("Sign Up"));
 }

@@ -1,4 +1,4 @@
-//Daniella Marie Costales 
+//Daniella Marie Costales
 //https://drive.google.com/file/d/1ilqxXrNGiFfntV2Z9p0i-RM-2zWiZ_rG/view
 // FirebaseAuthAPI class: This class encapsulates Firebase authentication functionality. It provides methods for signing in, signing up, signing out, and getting the current user.
 // auth static field: This field holds an instance of FirebaseAuth, which is the entry point for all Firebase authentication operations.
@@ -11,7 +11,7 @@
 //added users collection and its api
 //added getUID
 
-
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -26,7 +26,6 @@ class FirebaseAuthAPI {
   Stream<User?> userSignedIn() {
     return auth.authStateChanges();
   }
-  
 
   Future<String?> signIn(String email, String password) async {
     try {
@@ -36,7 +35,7 @@ class FirebaseAuthAPI {
       // Get the currently signed-in user's ID
       String userId = auth.currentUser!.uid;
 
-      // Check Firestore collections where the user belongs to. 
+      // Check Firestore collections where the user belongs to.
       bool isOrg = await FirebaseFirestore.instance
           .collection('user_orgs')
           .doc(userId)
@@ -54,8 +53,8 @@ class FirebaseAuthAPI {
         return "Org";
       } else if (isDonor) {
         return "Donor";
-      } return "";
-
+      }
+      return "";
     } on FirebaseAuthException catch (e) {
       // Handle Firebase authentication errors
       if (e.code == 'invalid-email') {
@@ -72,66 +71,105 @@ class FirebaseAuthAPI {
     await auth.signOut();
   }
 
-  Future<String?> signUp(bool donor, String email, String password, Map<String, dynamic> userMap) async {
-    //identify if the sign up is as org or as donor
-    UserCredential credential;
+  Future<String?> signUp(bool donor, String email, String password,
+      Map<String, dynamic> userMap) async {
     try {
-      credential = await auth.createUserWithEmailAndPassword(
+      UserCredential credential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
       String newUserId = credential.user!.uid;
-      if (donor) {
-        addUser("user_donor", userMap, newUserId); //adds user to the database
-      } else {
-        addUser("user_org", userMap, newUserId);
-      }
-      return("User signed up successfully: ${credential.user!.uid}");
+      // sign up as donor by default
+      addUser("user_donors", userMap, newUserId); //adds user to the database
+
+      return ("User signed up successfully: ${credential.user!.uid}");
       // return credential.user!.uid; // Return the user UID
       // print(credential);
     } on FirebaseAuthException catch (e) {
       //possible to return something more useful
       //than just print an error message to improve UI/UX
       if (e.code == 'email-already-in-use') {
-        return('The account already exists for that email.');
-      }return null;
+        return ('The account already exists for that email.');
+      }
+      return null;
     } catch (e) {
-      return("$e");
+      return ("$e");
     }
   }
 
-  Future<String?> addUser(String collection, Map<String, dynamic> userData, String uid) async {
-      try {
-        await db.collection(collection).doc(uid).set(userData); // Use user UID as document ID
-        return "User data added successfully!";
-      } on FirebaseException catch (e) {
-        return "Error adding user data: ${e.message}";
+  // Future<void> signUp(BuildContext context, String fname, String lname,
+  //     String email, String password) async {
+  //   try {
+  //     UserCredential credential = await auth.createUserWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
+
+  //     // Save data to firestore
+  //     await _firestore.collection('users').doc(credential.user!.uid).set({
+  //       'firstName': fname,
+  //       'lastName': lname,
+  //       'email': email,
+  //     });
+
+  //     // Update display name
+  //     await credential.user?.updateDisplayName('$fname $lname');
+
+  //     // Reload
+  //     await credential.user?.reload();
+
+  //     print(credential);
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Account created successfully.'),
+  //       ),
+  //     );
+  //   } on FirebaseAuthException catch (e) {
+  //     String message = 'An error occurred.';
+  //     if (e.code == 'email-already-in-use') {
+  //       message = 'Account already exists for that email.';
+  //     }
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(message),
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  Future<String?> addUser(
+      String collection, Map<String, dynamic> userData, String uid) async {
+    try {
+      await db
+          .collection(collection)
+          .doc(uid)
+          .set(userData); // Use user UID as document ID
+      return "User data added successfully!";
+    } on FirebaseException catch (e) {
+      return "Error adding user data: ${e.message}";
+    }
+  }
+
+  Stream<Map<String, String>> getUserInfo() {
+    String? uid = auth.currentUser?.uid;
+    return db.collection("users").doc(uid).snapshots().map((snapshot) {
+      if (snapshot.exists) {
+        var userData = snapshot.data()!;
+        return {
+          'first_name': userData['first_name'] ?? '',
+          'last_name': userData['last_name'] ?? '',
+          'email': userData['email'] ?? '',
+        };
+      } else {
+        return {
+          'first_name': '',
+          'last_name': '',
+          'email': '',
+        };
       }
+    });
   }
-
-Stream<Map<String, String>> getUserInfo() {
-  String? uid = auth.currentUser?.uid;
-  return db
-      .collection("users")
-      .doc(uid)
-      .snapshots()
-      .map((snapshot) {
-        if (snapshot.exists) {
-          var userData = snapshot.data()!;
-          return {
-            'first_name': userData['first_name'] ?? '',
-            'last_name': userData['last_name'] ?? '',
-            'email': userData['email'] ?? '',
-          };
-        } else {
-          return {
-            'first_name': '',
-            'last_name': '',
-            'email': '',
-          };
-        }
-      });
-  }
-
-
-}//end of class declaration
+} //end of class declaration
