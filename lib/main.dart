@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pages/signin.dart';
 import 'pages/home.dart';
-import 'pages/orglist.dart';
+import 'pages/donor/orglist.dart';
 
 void main() {
   runApp(const MyApp());

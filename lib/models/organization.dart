@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Organization{
+class Organization {
   String id;
   String name;
   String description;
@@ -13,10 +13,10 @@ class Organization{
     required this.description,
     required this.images,
     required this.donations,
-  })
+  });
 }
 
-class Donation{
+class Donation {
   String transactionId;
   String donorId;
   double amount;
@@ -27,6 +27,5 @@ class Donation{
     required this.donorId,
     required this.amount,
     required this.status,
-  })
-
+  });
 }
