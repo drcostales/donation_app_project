@@ -26,7 +26,6 @@ class _SignUpState extends State<SignUpPage> {
   bool isPasswordValid = false;
 
   final _pwcontroller = TextEditingController();
-  final _contactController = PhoneNumberEditingController();
 
   @override
   void dispose() {

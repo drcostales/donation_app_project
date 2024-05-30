@@ -3,7 +3,6 @@
 class Organization {
   String? id;
   String name;
-  String username;
   String email;
   String contact_no;
   List<String> addresses = [];
@@ -11,10 +10,10 @@ class Organization {
   String org_name;
   String status;
 
-  Organization(String address, {
+  Organization(
+    String address, {
     this.id,
     required this.name,
-    required this.username,
     required this.email,
     required this.contact_no,
     List<String>? addresses,

@@ -1,4 +1,4 @@
-//add method to convert this into a Map <String, dynamic> format. 
+//add method to convert this into a Map <String, dynamic> format.
 
 class Donation {
   final String category;
@@ -11,7 +11,7 @@ class Donation {
   final String status;
   final String organization;
   final String donor_id;
-  
+
   Donation({
     required this.category,
     required this.pickupOrDropOff,
@@ -25,4 +25,3 @@ class Donation {
     required this.donor_id,
   });
 }
-
